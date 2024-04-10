@@ -56,6 +56,17 @@ class FragmentMap : Fragment() {
         binding.locationButton.setOnClickListener {
             showMyLocation()
         }
+
+        binding.enlargeButton.setOnClickListener { changeZoom(1f) }
+        binding.reduceButton.setOnClickListener { changeZoom(-1f) }
+    }
+
+    private fun changeZoom(delta: Float) {
+        val currentZoom = mapView.map.cameraPosition.zoom
+        mapView.map.move(
+            CameraPosition(mapView.map.cameraPosition.target, currentZoom + delta, 0.0f, 0.0f),
+            Animation(Animation.Type.SMOOTH, 1f), null
+        )
     }
 
     private fun checkPermissions() {
