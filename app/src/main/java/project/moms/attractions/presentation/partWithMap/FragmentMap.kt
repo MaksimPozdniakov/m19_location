@@ -23,7 +23,12 @@ import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import project.moms.attractions.R
+import project.moms.attractions.data.api.NetworkApi
 import project.moms.attractions.databinding.FragmentMapBinding
+import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.map.PlacemarkMapObject
+import project.moms.attractions.model.Element
 
 class FragmentMap : Fragment() {
     private var _binding : FragmentMapBinding? = null
@@ -40,6 +45,7 @@ class FragmentMap : Fragment() {
     private lateinit var mapView: MapView
     private lateinit var mapObjects: MapObjectCollection
     private lateinit var fusedClient: FusedLocationProviderClient
+    private lateinit var viewModel: MapViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater)
@@ -48,10 +54,23 @@ class FragmentMap : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
         mapView = view.findViewById(R.id.mapView)
         mapObjects = mapView.map.mapObjects.addCollection()
 
         fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+        viewModel = MapViewModel(NetworkApi.apiService)
+        viewModel.landmarkData.observe(viewLifecycleOwner, Observer { landmarks ->
+            landmarks?.let {
+                // Добавляем маркеры на карту при обновлении данных
+                addMarkers(it)
+            }
+        })
+
+        viewModel.fetchLandmarks()
 
         binding.locationButton.setOnClickListener {
             showMyLocation()
@@ -106,6 +125,39 @@ class FragmentMap : Fragment() {
             }
         } else {
             launcher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun addMarkers(landmarks: List<Element>) {
+        for (landmark in landmarks) {
+            addPlaceMarkIfValid(landmark)
+        }
+        setupMarkerTapListener()
+    }
+
+    private fun addPlaceMarkIfValid(element: Element) {
+        val name = element.tags["name:en"] ?: "Unknown"
+
+        if (name != "Unknown") {
+            val latitude = element.lat
+            val longitude = element.lon
+            val markerName = name
+
+            val point = Point(latitude, longitude)
+            addPlaceMark(point, markerName)
+        }
+    }
+
+    private fun setupMarkerTapListener() {
+        mapObjects.addTapListener { mapObject, _ ->
+            if (mapObject is PlacemarkMapObject) {
+                val userData = mapObject.userData as? String
+                val message = "Место: $userData"
+                Snackbar.make(mapView, message, Snackbar.LENGTH_SHORT).show()
+                true
+            } else {
+                false
+            }
         }
     }
 

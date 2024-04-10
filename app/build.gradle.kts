@@ -78,6 +78,13 @@ dependencies {
     // Location
     implementation("com.google.android.gms:play-services-location:21.2.0")
 
+    // Retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.10.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // okhttp3
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
