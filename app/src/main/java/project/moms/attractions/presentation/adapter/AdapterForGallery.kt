@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import project.moms.attractions.R
-import project.moms.attractions.data.Photo
+import project.moms.attractions.model.Photo
 
 class AdapterForGallery : ListAdapter<Photo, AdapterForGallery.PhotoViewHolder>(DiffCallback()) {
     override fun onCreateViewHolder(

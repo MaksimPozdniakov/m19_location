@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import project.moms.attractions.data.GalleryDao
-import project.moms.attractions.data.Photo
+import project.moms.attractions.model.Photo
 
 class MainViewModel(
     private val galleryDao: GalleryDao

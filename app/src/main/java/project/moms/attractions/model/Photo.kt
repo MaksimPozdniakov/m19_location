@@ -1,4 +1,4 @@
-package project.moms.attractions.data
+package project.moms.attractions.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

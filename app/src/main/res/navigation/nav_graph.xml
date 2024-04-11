@@ -34,5 +34,12 @@
         <action
             android:id="@+id/action_fragmentMap_to_fragmentTakePhoto"
             app:destination="@id/fragmentTakePhoto" />
+        <action
+            android:id="@+id/action_fragmentMap_to_fragmentFullScreenItem"
+            app:destination="@id/fragmentFullScreenItem" />
     </fragment>
+    <fragment
+        android:id="@+id/fragmentFullScreenItem"
+        android:name="project.moms.attractions.presentation.partWithMap.FragmentFullScreenItem"
+        android:label="FragmentFullScreenItem" />
 </navigation>
