@@ -21,7 +21,6 @@ class MapViewModel(
     }
 
     fun fetchLandmarks() {
-        // Создание тела запроса с использованием переданных координат и выполнение запроса
         val requestBody = createRequestBody()
         val call = apiService.getLandmarks(requestBody)
 
@@ -37,13 +36,11 @@ class MapViewModel(
                         landmarkData.value = it // передаем данные в LiveData
                     }
                 } else {
-                    // Handle error
                     Log.e("MainActivity", "Failed to fetch landmarks: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<LandmarkResponse>, t: Throwable) {
-                // Handle network error
                 Log.e("MainActivity", "Failed to fetch landmarks: ${t.message}")
             }
         })

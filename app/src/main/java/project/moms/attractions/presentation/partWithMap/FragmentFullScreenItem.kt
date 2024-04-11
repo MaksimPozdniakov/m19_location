@@ -28,9 +28,12 @@ class FragmentFullScreenItem : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val marker = arguments?.getParcelable<Element>(KEY_MARKER)
         marker?.let {
-            // Используйте информацию о маркере для отображения на экране
             val name = it.tags["name:en"] ?: "Unknown"
+            val latitude = it.lat
+            val longitude = it.lon
             binding.fieldHeader.text = name
+            binding.fieldLatitude.text = "Широта:\n$latitude"
+            binding.fieldLongitude.text = "Долгота:\n$longitude"
         }
     }
 
