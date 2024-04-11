@@ -7,13 +7,15 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.Animation
@@ -21,15 +23,12 @@ import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.MapObjectCollection
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import project.moms.attractions.R
 import project.moms.attractions.data.api.NetworkApi
 import project.moms.attractions.databinding.FragmentMapBinding
-import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.map.PlacemarkMapObject
 import project.moms.attractions.model.Element
 
 class FragmentMap : Fragment() {
@@ -67,7 +66,6 @@ class FragmentMap : Fragment() {
         viewModel = MapViewModel(NetworkApi.apiService)
         viewModel.landmarkData.observe(viewLifecycleOwner, Observer { landmarks ->
             landmarks?.let {
-                // Добавляем маркеры на карту при обновлении данных
                 addMarkers(it)
             }
         })
@@ -103,7 +101,6 @@ class FragmentMap : Fragment() {
     }
 
     private fun showMyLocation() {
-        // Проверяем все необходимые разрешения
         val permissionsToRequest = REQUEST_PERMISSIONS.filter {
             ContextCompat.checkSelfPermission(requireContext(), it) !=
                     PackageManager.PERMISSION_GRANTED
@@ -139,7 +136,6 @@ class FragmentMap : Fragment() {
 
     private fun addPlaceMarkIfValid(element: Element) {
         val name = element.tags["name:en"] ?: "Unknown"
-
         if (name != "Unknown") {
             val latitude = element.lat
             val longitude = element.lon
@@ -155,11 +151,7 @@ class FragmentMap : Fragment() {
             if (mapObject is PlacemarkMapObject) {
                 val userData = mapObject.userData as? Element
                 Log.d("User Data", userData.toString())
-//                val message = "Место: $userData"
-//                Snackbar.make(mapView, message, Snackbar.LENGTH_SHORT).show()
-
                 userData?.let { sendMarker(it) }
-
                 true
             } else {
                 false

@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:textColor="@color/text_color"
             android:textColorHint="@color/text_color"
-            android:textSize="35sp"
+            android:textSize="25sp"
             android:hint="Название"
             android:gravity="center"
             android:background="@color/background_content"/>
@@ -46,24 +46,26 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fieldLat"
+                android:id="@+id/fieldLatitude"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:padding="5dp"
                 android:layout_height="match_parent"
                 android:textColor="@color/text_color"
                 android:textColorHint="@color/text_color"
-                android:textSize="35sp"
+                android:textSize="25sp"
                 android:hint="Широта"
                 android:gravity="center"
                 android:background="@color/background_content"/>
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fieldLon"
+                android:id="@+id/fieldLongitude"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:padding="5dp"
                 android:layout_height="match_parent"
                 android:textColor="@color/text_color"
                 android:textColorHint="@color/text_color"
-                android:textSize="35sp"
+                android:textSize="25sp"
                 android:hint="Долгота"
                 android:gravity="center"
                 android:background="@color/background_content"/>
