@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +47,11 @@ class FragmentMap : Fragment() {
     private lateinit var fusedClient: FusedLocationProviderClient
     private lateinit var viewModel: MapViewModel
 
+    private var saveLatitude = 0.0
+    private var saveLongitude = 0.0
+    private var saveZoom = 0.0f
+    private var routeStartLocation = Point(0.0, 0.0)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMapBinding.inflate(inflater)
         return binding.root
@@ -55,8 +59,6 @@ class FragmentMap : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
 
         mapView = view.findViewById(R.id.mapView)
         mapObjects = mapView.map.mapObjects.addCollection()
@@ -72,12 +74,38 @@ class FragmentMap : Fragment() {
 
         viewModel.fetchLandmarks()
 
+        if (savedInstanceState != null) {
+            saveLatitude = savedInstanceState.getDouble(SAVE_LATITUDE)
+            saveLongitude = savedInstanceState.getDouble(SAVE_LONGITUDE)
+            saveZoom = savedInstanceState.getFloat(SAVE_ZOOM)
+            routeStartLocation = Point(saveLatitude, saveLongitude)
+            cameraSavePosition()
+        }
+
         binding.locationButton.setOnClickListener {
             showMyLocation()
         }
 
         binding.enlargeButton.setOnClickListener { changeZoom(1f) }
         binding.reduceButton.setOnClickListener { changeZoom(-1f) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putDouble(SAVE_LATITUDE, saveLatitude)
+        outState.putDouble(SAVE_LONGITUDE, saveLongitude)
+        outState.putFloat(SAVE_ZOOM, saveZoom)
+    }
+
+    private fun cameraSavePosition() {
+        mapView.mapWindow.map.move(
+            CameraPosition(
+                Point(saveLatitude, saveLongitude),
+                saveZoom,
+                0f,
+                0f
+            )
+        )
     }
 
     private fun changeZoom(delta: Float) {
@@ -89,16 +117,16 @@ class FragmentMap : Fragment() {
     }
 
     private fun checkPermissions() {
-        val isAllGranted = REQUEST_PERMISSIONS.all { permission ->
-            ContextCompat.checkSelfPermission(requireContext(), permission) ==
-                    PackageManager.PERMISSION_GRANTED
+            val isAllGranted = REQUEST_PERMISSIONS.all { permission ->
+                ContextCompat.checkSelfPermission(requireContext(), permission) ==
+                        PackageManager.PERMISSION_GRANTED
+            }
+            if (isAllGranted) {
+                Toast.makeText(requireContext(), "permission is Granted", Toast.LENGTH_SHORT).show()
+            } else {
+                launcher.launch(REQUEST_PERMISSIONS)
+            }
         }
-        if (isAllGranted) {
-            Toast.makeText(requireContext(), "permission is Granted", Toast.LENGTH_SHORT).show()
-        } else {
-            launcher.launch(REQUEST_PERMISSIONS)
-        }
-    }
 
     private fun showMyLocation() {
         val permissionsToRequest = REQUEST_PERMISSIONS.filter {
@@ -111,6 +139,13 @@ class FragmentMap : Fragment() {
                 location?.let {
                     val point = Point(it.latitude, it.longitude)
                     val namePlace = "My location"
+
+                    // Записываем значения в наши константы для сохранения положения карты
+                    saveLatitude = it.latitude
+                    saveLongitude = it.longitude
+                    saveZoom = 11.0f
+
+
                     mapView.map.move(
                         CameraPosition(
                             point,
@@ -119,7 +154,15 @@ class FragmentMap : Fragment() {
                             0.0f
                         ), Animation(Animation.Type.SMOOTH, 3f), null
                     )
-                    //addPlaceMark(point, namePlace)
+
+                    val currentLocation = Element(
+                        type = "currentLocation",
+                        id = 0L,
+                        lat = it.latitude,
+                        lon = it.longitude,
+                        tags = mapOf()
+                    )
+                    addPlaceMark(point, namePlace, currentLocation)
                 }
             }
         } else {
@@ -150,7 +193,6 @@ class FragmentMap : Fragment() {
         mapObjects.addTapListener { mapObject, _ ->
             if (mapObject is PlacemarkMapObject) {
                 val userData = mapObject.userData as? Element
-                Log.d("User Data", userData.toString())
                 userData?.let { sendMarker(it) }
                 true
             } else {
@@ -208,10 +250,15 @@ class FragmentMap : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
     companion object {
         private val REQUEST_PERMISSIONS: Array<String> = buildList {
             add(Manifest.permission.ACCESS_FINE_LOCATION)
             add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }.toTypedArray()
+
+        private const val SAVE_LATITUDE = "latitude"
+        private const val SAVE_LONGITUDE = "longitude"
+        private const val SAVE_ZOOM = "zoom"
     }
 }

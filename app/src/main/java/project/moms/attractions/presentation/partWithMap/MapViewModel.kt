@@ -33,7 +33,7 @@ class MapViewModel(
                     val landmarkResponse = response.body()
                     landmarkResponse?.elements?.let {
                         Log.d("MapViewModel", "Received landmarks: $it")
-                        landmarkData.value = it // передаем данные в LiveData
+                        landmarkData.value = it
                     }
                 } else {
                     Log.e("MainActivity", "Failed to fetch landmarks: ${response.code()}")
