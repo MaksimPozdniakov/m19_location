@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("kotlin-kapt")
+    id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
 }
 
@@ -84,6 +85,12 @@ dependencies {
 
     // okhttp3
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
+    // CardView
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // RoundImageView
+    implementation("com.makeramen:roundedimageview:2.3.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

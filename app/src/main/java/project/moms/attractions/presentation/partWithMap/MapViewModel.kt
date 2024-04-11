@@ -33,6 +33,7 @@ class MapViewModel(
                 if (response.isSuccessful) {
                     val landmarkResponse = response.body()
                     landmarkResponse?.elements?.let {
+                        Log.d("MapViewModel", "Received landmarks: $it")
                         landmarkData.value = it // передаем данные в LiveData
                     }
                 } else {

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import project.moms.attractions.R
 import project.moms.attractions.data.api.NetworkApi
 import project.moms.attractions.databinding.FragmentMapBinding
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.map.PlacemarkMapObject
 import project.moms.attractions.model.Element
@@ -120,7 +122,7 @@ class FragmentMap : Fragment() {
                             0.0f
                         ), Animation(Animation.Type.SMOOTH, 3f), null
                     )
-                    addPlaceMark(point, namePlace)
+                    //addPlaceMark(point, namePlace)
                 }
             }
         } else {
@@ -144,16 +146,20 @@ class FragmentMap : Fragment() {
             val markerName = name
 
             val point = Point(latitude, longitude)
-            addPlaceMark(point, markerName)
+            addPlaceMark(point, markerName, element)
         }
     }
 
     private fun setupMarkerTapListener() {
         mapObjects.addTapListener { mapObject, _ ->
             if (mapObject is PlacemarkMapObject) {
-                val userData = mapObject.userData as? String
-                val message = "Место: $userData"
-                Snackbar.make(mapView, message, Snackbar.LENGTH_SHORT).show()
+                val userData = mapObject.userData as? Element
+                Log.d("User Data", userData.toString())
+//                val message = "Место: $userData"
+//                Snackbar.make(mapView, message, Snackbar.LENGTH_SHORT).show()
+
+                userData?.let { sendMarker(it) }
+
                 true
             } else {
                 false
@@ -161,7 +167,14 @@ class FragmentMap : Fragment() {
         }
     }
 
-    private fun addPlaceMark(point: Point, namePlace: String) {
+    private fun sendMarker(item: Element) {
+        val bundle = Bundle().apply {
+            putParcelable(FragmentFullScreenItem.KEY_MARKER, item)
+        }
+        findNavController().navigate(R.id.action_fragmentMap_to_fragmentFullScreenItem, bundle)
+    }
+
+    private fun addPlaceMark(point: Point, namePlace: String, element: Element) {
         val placeMark = mapObjects.addPlacemark(point)
         placeMark.opacity = 0.5f
 
@@ -169,7 +182,7 @@ class FragmentMap : Fragment() {
         val icon = ImageProvider.fromBitmap(bitmap)
         placeMark.setIcon(icon)
 
-        placeMark.userData = namePlace
+        placeMark.userData = element
     }
 
     private fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap? {
